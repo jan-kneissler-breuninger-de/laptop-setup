@@ -20,7 +20,7 @@ if command -v claude &> /dev/null; then
         echo "Running onboarding script..."
 
         SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-        ONBOARDING_SCRIPT="$SCRIPT_DIR/claude_onboarding.sh"
+        ONBOARDING_SCRIPT="$SCRIPT_DIR/downloaded/claude_onboarding.sh"
 
         if [ -f "$ONBOARDING_SCRIPT" ]; then
             bash "$ONBOARDING_SCRIPT"
@@ -36,7 +36,7 @@ else
 
     # Run Claude onboarding script after fresh installation
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-    ONBOARDING_SCRIPT="$SCRIPT_DIR/claude_onboarding.sh"
+    ONBOARDING_SCRIPT="$SCRIPT_DIR/downloaded/claude_onboarding.sh"
 
     if [ -f "$ONBOARDING_SCRIPT" ]; then
         echo ""
