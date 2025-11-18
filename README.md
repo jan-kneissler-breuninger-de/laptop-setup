@@ -20,6 +20,19 @@ This will install and configure:
 
 All installation steps are logged in the `logs/` directory.
 
+Still TODO:
+ - AnyDesk
+ - AltTab
+ - BitWarden
+ - DiskSpaceAnalyzer    
+ - draw.io
+ - Postman
+
+Brew:
+- terraform + tfswitch
+- docker
+- graphviz
+
 ## Manual Steps
 
 ### 1. Chrome Browser
