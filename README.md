@@ -28,11 +28,6 @@ Still TODO:
  - draw.io
  - Postman
 
-Brew:
-- terraform + tfswitch
-- docker
-- graphviz
-
 ## Manual Steps
 
 ### 1. Chrome Browser
