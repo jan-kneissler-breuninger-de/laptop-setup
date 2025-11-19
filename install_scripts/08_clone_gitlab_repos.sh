@@ -77,8 +77,8 @@ if [ -f "$GITLAB_FILE" ]; then
                 (cd "$repo_dir" && git pull --ff-only) || echo "⚠️  Could not update $repo_path"
             else
                 echo "📦 Cloning $repo_path to $repo_dir..."
-                # Use glab to clone, which handles authentication and host properly
-                (cd "$group_dir" && glab repo clone "$repo_path" --hostname "$GITLAB_HOST") || echo "⚠️  Could not clone $repo_path"
+                # Use glab to clone with GITLAB_HOST environment variable
+                (cd "$group_dir" && GITLAB_HOST="$GITLAB_HOST" glab repo clone "$repo_path") || echo "⚠️  Could not clone $repo_path"
             fi
         done
 
