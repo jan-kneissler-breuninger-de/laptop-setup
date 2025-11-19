@@ -3,5 +3,6 @@
 
 terraform
 glab
+gh
 kubectl
 jq

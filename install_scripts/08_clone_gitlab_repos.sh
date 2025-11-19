@@ -9,7 +9,7 @@ echo "Cloning GitLab repositories..."
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 GITLAB_FILE="$SCRIPT_DIR/../gitlab.txt"
-CLONE_BASE_DIR="$HOME/git"
+CLONE_BASE_DIR="$HOME/git/gitlab"
 GITLAB_HOST="gitlab.breuni.de"
 
 # Create base directory for cloned repos

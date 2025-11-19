@@ -1,0 +1,5 @@
+# GitHub users/organizations to clone all public repositories from
+# One user/org per line, comments starting with # are ignored
+
+k-pipe
+pipeline-steps
