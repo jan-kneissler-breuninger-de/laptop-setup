@@ -17,16 +17,13 @@ This will install and configure:
 - Google Cloud CLI (gcloud) with components
 - Claude CLI with telemetry configuration
 - Docker Desktop
+- JetBrains IDEs (IntelliJ IDEA, GoLand, PyCharm)
+- Additional tools (terraform, kubectl, glab, gh, jq, graphviz, tfswitch)
+- Productivity apps (AnyDesk, AltTab, BitWarden, DaisyDisk, draw.io, Postman)
+- Clone GitLab repositories from configured groups
+- Clone GitHub repositories from configured users/orgs
 
 All installation steps are logged in the `logs/` directory.
-
-Still TODO:
- - AnyDesk
- - AltTab
- - BitWarden
- - DiskSpaceAnalyzer    
- - draw.io
- - Postman
 
 ## Manual Steps
 

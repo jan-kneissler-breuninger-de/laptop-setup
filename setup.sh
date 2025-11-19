@@ -45,9 +45,10 @@ run_install_script "06_jetbrains_ides.sh"
 run_install_script "07_brew_packages.sh"
 run_install_script "08_clone_gitlab_repos.sh"
 run_install_script "09_clone_github_repos.sh"
+run_install_script "10_productivity_apps.sh"
 
 # Add more scripts as needed
-# run_install_script "10_python.sh"
+# run_install_script "11_python.sh"
 # etc.
 
 log "========================================="
