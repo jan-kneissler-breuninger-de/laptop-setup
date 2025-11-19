@@ -21,15 +21,28 @@ if ! command -v glab &> /dev/null; then
     exit 1
 fi
 
+# Token file location
+GITLAB_TOKEN_FILE="$HOME/.gitlab/glab-token"
+
 # Check if glab is authenticated for the custom host
 echo "Checking glab authentication for $GITLAB_HOST..."
 if ! glab auth status --hostname "$GITLAB_HOST" &>/dev/null; then
     echo "⚠️  glab is not authenticated for $GITLAB_HOST"
-    echo "Please authenticate with: glab auth login --hostname $GITLAB_HOST"
-    exit 1
-fi
 
-echo "✅ glab is authenticated for $GITLAB_HOST"
+    # Check if token file exists
+    if [ -f "$GITLAB_TOKEN_FILE" ]; then
+        echo "📝 Found token file at $GITLAB_TOKEN_FILE, authenticating..."
+        GITLAB_TOKEN=$(cat "$GITLAB_TOKEN_FILE")
+        echo "$GITLAB_TOKEN" | glab auth login --hostname "$GITLAB_HOST" --stdin
+        echo "✅ Authenticated using token from $GITLAB_TOKEN_FILE"
+    else
+        echo "❌ Token file not found at $GITLAB_TOKEN_FILE"
+        echo "Please create the token file or authenticate with: glab auth login --hostname $GITLAB_HOST"
+        exit 1
+    fi
+else
+    echo "✅ glab is already authenticated for $GITLAB_HOST"
+fi
 
 if [ -f "$GITLAB_FILE" ]; then
     while IFS= read -r group_url || [ -n "$group_url" ]; do
