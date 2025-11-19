@@ -41,9 +41,10 @@ run_install_script "02_git.sh"
 run_install_script "03_development_tools.sh"
 run_install_script "04_claude.sh"
 run_install_script "05_docker.sh"
+run_install_script "06_jetbrains_ides.sh"
 
 # Add more scripts as needed
-# run_install_script "06_python.sh"
+# run_install_script "07_python.sh"
 # etc.
 
 log "========================================="
