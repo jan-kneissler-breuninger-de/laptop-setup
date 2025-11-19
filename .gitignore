@@ -1,0 +1,12 @@
+# Logs directory - don't commit installation logs
+logs/
+
+# Downloaded files
+downloaded/
+
+# macOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.log
