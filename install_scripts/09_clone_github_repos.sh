@@ -20,15 +20,28 @@ if ! command -v gh &> /dev/null; then
     exit 1
 fi
 
+# Token file location
+GITHUB_TOKEN_FILE="$HOME/.github/token"
+
 # Check if gh is authenticated
 echo "Checking gh authentication..."
 if ! gh auth status &>/dev/null; then
     echo "⚠️  gh is not authenticated"
-    echo "Please authenticate with: gh auth login"
-    exit 1
-fi
 
-echo "✅ gh is authenticated"
+    # Check if token file exists
+    if [ -f "$GITHUB_TOKEN_FILE" ]; then
+        echo "📝 Found token file at $GITHUB_TOKEN_FILE, authenticating..."
+        GITHUB_TOKEN=$(cat "$GITHUB_TOKEN_FILE")
+        echo "$GITHUB_TOKEN" | gh auth login --with-token
+        echo "✅ Authenticated using token from $GITHUB_TOKEN_FILE"
+    else
+        echo "❌ Token file not found at $GITHUB_TOKEN_FILE"
+        echo "Please create the token file or authenticate with: gh auth login"
+        exit 1
+    fi
+else
+    echo "✅ gh is already authenticated"
+fi
 
 if [ -f "$GITHUB_FILE" ]; then
     while IFS= read -r user_or_org || [ -n "$user_or_org" ]; do
