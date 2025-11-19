@@ -40,28 +40,27 @@ if [ -f "$GITLAB_FILE" ]; then
         echo "📂 Processing group: $group_path"
 
         # Create directory for this group
-        group_dir="$CLONE_BASE_DIR/$group_path"
+        group_dir="$CLONE_BASE_DIR"
         mkdir -p "$group_dir"
 
         # List all repositories in the group and clone them
-        echo "Fetching repositories from $group_path..."
+        echo "Fetching repositories from $group_path (including subgroups)..."
 
-        # Use glab API to get all projects in the group
+        # Use glab API to get all projects in the group including subgroups
         glab api -h "$GITLAB_HOST" "groups/$group_path/projects?per_page=100&include_subgroups=true" --paginate 2>/dev/null | \
-        jq -r '.[].ssh_url_to_repo' 2>/dev/null | while read -r ssh_url; do
+        jq -r '.[] | .path_with_namespace' 2>/dev/null | while read -r repo_path; do
             # Skip empty lines
-            [[ -z "$ssh_url" ]] && continue
+            [[ -z "$repo_path" ]] && continue
 
-            # Extract repo name from SSH URL (e.g., git@gitlab.breuni.de:ace/repo.git -> repo)
-            repo_name=$(basename "$ssh_url" .git)
-            repo_dir="$group_dir/$repo_name"
+            repo_dir="$group_dir/$repo_path"
 
             if [ -d "$repo_dir/.git" ]; then
-                echo "✅ $repo_name already cloned, pulling latest changes..."
-                (cd "$repo_dir" && git pull --ff-only 2>/dev/null) || echo "⚠️  Could not update $repo_name"
+                echo "✅ $repo_path already cloned, pulling latest changes..."
+                (cd "$repo_dir" && git pull --ff-only 2>/dev/null) || echo "⚠️  Could not update $repo_path"
             else
-                echo "📦 Cloning $repo_name..."
-                git clone "$ssh_url" "$repo_dir" 2>/dev/null || echo "⚠️  Could not clone $repo_name"
+                echo "📦 Cloning $repo_path..."
+                # Use glab to clone, which handles authentication and host properly
+                (cd "$group_dir" && glab repo clone "$repo_path" -h "$GITLAB_HOST" 2>/dev/null) || echo "⚠️  Could not clone $repo_path"
             fi
         done
 
