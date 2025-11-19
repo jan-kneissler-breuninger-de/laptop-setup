@@ -1,0 +1,6 @@
+# GitLab groups to clone all repositories from
+# One group URL per line, comments starting with # are ignored
+
+https://gitlab.breuni.de/ace
+https://gitlab.breuni.de/gcp
+https://gitlab.breuni.de/jan-kneissler
