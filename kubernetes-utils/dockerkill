@@ -1,0 +1,1 @@
+docker ps | tail +2 | awk '{print "docker kill",$1}' | sh
