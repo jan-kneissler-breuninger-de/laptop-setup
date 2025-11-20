@@ -52,11 +52,14 @@ if gcloud auth print-identity-token &>/dev/null; then
             [[ -z "$component" || "$component" =~ ^[[:space:]]*# ]] && continue
 
             # Check if component is already installed
-            if gcloud components list --filter="id:$component" --format="value(state.name)" 2>/dev/null | grep -q "Installed"; then
+            component_status=$(gcloud components list --filter="id:$component" --format="value(state.name)" 2>/dev/null)
+
+            if [ "$component_status" = "Installed" ]; then
                 echo "✅ gcloud $component component already installed"
             else
                 echo "📦 Installing gcloud $component component..."
                 gcloud components install "$component" --quiet
+                echo "✅ gcloud $component component installed successfully"
             fi
         done < "$COMPONENTS_FILE"
     else

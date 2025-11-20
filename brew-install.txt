@@ -2,7 +2,6 @@
 # One package per line, comments starting with # are ignored
 
 terraform
-warrensbox/tap/tfswitch
 glab
 gh
 kubectl
