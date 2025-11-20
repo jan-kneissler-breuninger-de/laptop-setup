@@ -65,4 +65,21 @@ if gcloud auth print-identity-token &>/dev/null; then
     else
         echo "⚠️  gcloud_components.txt file not found at $COMPONENTS_FILE"
     fi
+
+    # Fix gke-gcloud-auth-plugin symlink for Homebrew installations
+    echo "Checking gke-gcloud-auth-plugin symlink..."
+    if command -v gcloud &>/dev/null && [[ "$(which gcloud)" == *"/opt/homebrew/"* ]]; then
+        GCLOUD_PATH=$(which gcloud)
+        GCLOUD_DIR=$(dirname "$(readlink "$GCLOUD_PATH" || echo "$GCLOUD_PATH")")
+        PLUGIN_PATH="$GCLOUD_DIR/gke-gcloud-auth-plugin"
+        SYMLINK_PATH="/opt/homebrew/bin/gke-gcloud-auth-plugin"
+
+        if [ -f "$PLUGIN_PATH" ] && [ ! -L "$SYMLINK_PATH" ]; then
+            echo "📦 Creating symlink for gke-gcloud-auth-plugin..."
+            ln -sf "$PLUGIN_PATH" "$SYMLINK_PATH"
+            echo "✅ gke-gcloud-auth-plugin symlink created"
+        elif [ -L "$SYMLINK_PATH" ]; then
+            echo "✅ gke-gcloud-auth-plugin symlink already exists"
+        fi
+    fi
 fi
