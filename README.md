@@ -22,6 +22,7 @@ This will install and configure:
 - Productivity apps (AnyDesk, AltTab, BitWarden, DaisyDisk, draw.io, Postman)
 - Clone GitLab repositories from configured groups
 - Clone GitHub repositories from configured users/orgs
+- Python (via Homebrew) with pip
 
 All installation steps are logged in the `logs/` directory.
 
