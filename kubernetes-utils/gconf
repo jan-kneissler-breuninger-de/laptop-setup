@@ -1,0 +1,10 @@
+if [[ "$1" == "" ]]
+then
+  gcloud config configurations list
+else
+  gcloud config configurations activate $1
+  gcloud auth login --update-adc
+  PROJECT=$(gcloud config get project) 
+  echo Setting billing project to $PROJECT 
+  gcloud auth application-default set-quota-project $PROJECT
+fi

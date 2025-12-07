@@ -6,6 +6,7 @@ glab
 gh
 kubectl
 k9s
+kubecolor
 jq
 graphviz
 paintbrush

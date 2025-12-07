@@ -1,0 +1,11 @@
+pod=$1
+if test "$2" = ""
+then
+   echo Logs of  pod $pod*
+   container=
+else
+   echo Logs of container $2 in pod $pod*
+   container="--container $2"
+fi
+kubectl get pods | grep "^"$pod
+kubectl get pods | grep "^"$pod | awk "{print \"echo =====================================\";print \"kubectl logs -f\","'$1'",\"$container\"}" | sh

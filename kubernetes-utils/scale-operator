@@ -1,0 +1,2 @@
+kubectl get deployments -n k-pipe | grep "k-pipe" |  awk '{print "kubectl scale deployments/"$1" --replicas=0 -n k-pipe"}' | sh
+
