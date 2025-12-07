@@ -5,5 +5,7 @@ terraform
 glab
 gh
 kubectl
+k9s
 jq
 graphviz
+paintbrush

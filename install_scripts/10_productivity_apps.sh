@@ -42,6 +42,15 @@ else
     echo "✅ DaisyDisk installed successfully"
 fi
 
+# Install Disk Space Analyzer Inspector from Mac App Store
+if mas list | grep -q "446243721"; then
+    echo "✅ Disk Space Analyzer Inspector is already installed"
+else
+    echo "📦 Installing Disk Space Analyzer Inspector..."
+    mas install 446243721
+    echo "✅ Disk Space Analyzer Inspector installed successfully"
+fi
+
 # Install draw.io
 if [ -d "/Applications/draw.io.app" ]; then
     echo "✅ draw.io is already installed"
