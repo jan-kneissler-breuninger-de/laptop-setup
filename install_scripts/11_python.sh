@@ -26,4 +26,9 @@ else
     echo "✅ pip installed successfully"
 fi
 
+# Link Python 3.14 as default python3
+echo "Setting Python 3.14 as default python3..."
+brew unlink python@3.14 2>/dev/null || true
+brew link --overwrite python@3.14
+
 echo "✅ Python 3.14 and pip setup complete"
