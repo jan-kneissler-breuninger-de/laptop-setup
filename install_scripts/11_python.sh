@@ -26,8 +26,4 @@ else
     echo "✅ pip installed successfully"
 fi
 
-# Update pip to latest version
-echo "Updating pip to latest version..."
-python3.14 -m pip install --upgrade pip
-
 echo "✅ Python 3.14 and pip setup complete"
