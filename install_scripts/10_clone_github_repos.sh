@@ -54,11 +54,11 @@ if [ -f "$GITHUB_FILE" ]; then
         user_dir="$CLONE_BASE_DIR/$user_or_org"
         mkdir -p "$user_dir"
 
-        # List all public repositories and clone them
+        # List all repositories (public and private) and clone them
         echo "Fetching repositories from $user_or_org..."
 
-        # Use gh to list repos and clone each one
-        gh repo list "$user_or_org" --limit 1000 --json nameWithOwner --jq '.[].nameWithOwner' 2>&1 | while read -r repo_full_name; do
+        # Use gh to list repos and clone each one (includes both public and private repos when authenticated)
+        gh repo list "$user_or_org" --limit 1000 --json nameWithOwner --jq '.[].nameWithOwner' | while read -r repo_full_name; do
             # Skip empty lines
             [[ -z "$repo_full_name" ]] && continue
 
