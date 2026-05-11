@@ -63,20 +63,27 @@ if [ -z "${GITLAB_TOKEN:-}" ]; then
     echo ""
     if [ -z "$GITLAB_TOKEN" ]; then echo "❌ GitLab token is required. Exiting."; exit 1; fi
 
-    # Persist token to ~/.zshrc so it's available in all future terminal sessions
+    # 1. Save to ~/.zshrc as GITLAB_TOKEN and BRAC_GITLAB_TOKEN for terminal sessions
     ZSHRC="$HOME/.zshrc"
     touch "$ZSHRC"
-    if grep -q "GITLAB_TOKEN" "$ZSHRC"; then
-        # Update existing line
-        sed -i '' "s|export GITLAB_TOKEN=.*|export GITLAB_TOKEN=\"$GITLAB_TOKEN\"|" "$ZSHRC"
-        echo "✅ Updated GITLAB_TOKEN in $ZSHRC"
-    else
-        echo "" >> "$ZSHRC"
-        echo "# GitLab Personal Access Token (added by laptop-setup)" >> "$ZSHRC"
-        echo "export GITLAB_TOKEN=\"$GITLAB_TOKEN\"" >> "$ZSHRC"
-        echo "✅ Saved GITLAB_TOKEN to $ZSHRC"
-    fi
+    for VAR in GITLAB_TOKEN BRAC_GITLAB_TOKEN; do
+        if grep -q "export $VAR=" "$ZSHRC"; then
+            sed -i '' "s|export $VAR=.*|export $VAR=\"$GITLAB_TOKEN\"|" "$ZSHRC"
+        else
+            echo "" >> "$ZSHRC"
+            echo "export $VAR=\"$GITLAB_TOKEN\"  # added by laptop-setup" >> "$ZSHRC"
+        fi
+    done
+    echo "✅ Saved GITLAB_TOKEN and BRAC_GITLAB_TOKEN to $ZSHRC"
+
+    # 2. Save to ~/.gitlab/glab-token (used by glab CLI)
+    mkdir -p "$HOME/.gitlab"
+    echo "$GITLAB_TOKEN" > "$HOME/.gitlab/glab-token"
+    chmod 600 "$HOME/.gitlab/glab-token"
+    echo "✅ Saved token to ~/.gitlab/glab-token"
+
     export GITLAB_TOKEN
+    export BRAC_GITLAB_TOKEN="$GITLAB_TOKEN"
     CONFIG_CHANGED=true
 fi
 
