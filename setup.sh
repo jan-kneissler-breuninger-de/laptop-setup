@@ -29,8 +29,13 @@ if [ -f "$CONFIG_FILE" ]; then
     source "$CONFIG_FILE"
 fi
 
-# Also pick up GITLAB_TOKEN from environment (e.g. exported in ~/.zshrc)
-# so it doesn't need to be re-entered if already stored there
+# Pick up GITLAB_TOKEN from ~/.gitlab/glab-token if not already in environment
+# (setup.sh runs as bash and does not source ~/.zshrc)
+if [ -z "${GITLAB_TOKEN:-}" ] && [ -f "$HOME/.gitlab/glab-token" ]; then
+    GITLAB_TOKEN=$(cat "$HOME/.gitlab/glab-token")
+    export GITLAB_TOKEN
+    export BRAC_GITLAB_TOKEN="$GITLAB_TOKEN"
+fi
 
 CONFIG_CHANGED=false
 
