@@ -24,24 +24,33 @@ log "========================================="
 # Load or create local config
 CONFIG_FILE="$SCRIPT_DIR/config.local"
 
-if [ ! -f "$CONFIG_FILE" ]; then
+# Source existing config if present
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+fi
+
+# Also pick up GITLAB_TOKEN from environment (e.g. exported in ~/.zshrc)
+# so it doesn't need to be re-entered if already stored there
+
+CONFIG_CHANGED=false
+
+# GitLab URL
+if [ -z "${GITLAB_URL:-}" ]; then
     echo "========================================="
-    echo "First-time setup: configuring local settings"
+    echo "Setup: configuring local settings"
     echo "========================================="
     echo ""
-
-    # GitLab URL
     read -r -p "Enter your company GitLab URL (e.g. https://gitlab.example.com): " GITLAB_URL
-    GITLAB_URL="${GITLAB_URL%/}"  # strip trailing slash
-    if [ -z "$GITLAB_URL" ]; then
-        echo "❌ GitLab URL is required. Exiting."
-        exit 1
-    fi
+    GITLAB_URL="${GITLAB_URL%/}"
+    if [ -z "$GITLAB_URL" ]; then echo "❌ GitLab URL is required. Exiting."; exit 1; fi
+    CONFIG_CHANGED=true
+fi
 
-    # GitLab Personal Access Token
+# GitLab Personal Access Token
+if [ -z "${GITLAB_TOKEN:-}" ]; then
     echo ""
-    echo "A GitLab Personal Access Token is required to clone repositories and install"
-    echo "internal tools. To create one:"
+    echo "A GitLab Personal Access Token is required to clone repositories"
+    echo "and install internal tools. To create one:"
     echo "  1. Open: $GITLAB_URL/-/user_settings/personal_access_tokens"
     echo "  2. Click 'Add new token'"
     echo "  3. Name: laptop-setup (or any name)"
@@ -50,31 +59,47 @@ if [ ! -f "$CONFIG_FILE" ]; then
     echo "  6. Click 'Create personal access token'"
     echo "  7. Copy the token — it won't be shown again!"
     echo ""
-    read -rs -p "Enter your GitLab Personal Access Token: " GITLAB_TOKEN
+    read -rs -p "Paste your GitLab Personal Access Token: " GITLAB_TOKEN
     echo ""
-    if [ -z "$GITLAB_TOKEN" ]; then
-        echo "❌ GitLab token is required. Exiting."
-        exit 1
-    fi
+    if [ -z "$GITLAB_TOKEN" ]; then echo "❌ GitLab token is required. Exiting."; exit 1; fi
 
-    # Team and Department IDs (used for telemetry attribution)
+    # Persist token to ~/.zshrc so it's available in all future terminal sessions
+    ZSHRC="$HOME/.zshrc"
+    touch "$ZSHRC"
+    if grep -q "GITLAB_TOKEN" "$ZSHRC"; then
+        # Update existing line
+        sed -i '' "s|export GITLAB_TOKEN=.*|export GITLAB_TOKEN=\"$GITLAB_TOKEN\"|" "$ZSHRC"
+        echo "✅ Updated GITLAB_TOKEN in $ZSHRC"
+    else
+        echo "" >> "$ZSHRC"
+        echo "# GitLab Personal Access Token (added by laptop-setup)" >> "$ZSHRC"
+        echo "export GITLAB_TOKEN=\"$GITLAB_TOKEN\"" >> "$ZSHRC"
+        echo "✅ Saved GITLAB_TOKEN to $ZSHRC"
+    fi
+    export GITLAB_TOKEN
+    CONFIG_CHANGED=true
+fi
+
+# Team ID
+if [ -z "${TEAM_ID:-}" ]; then
     echo ""
     read -r -p "Enter your team abbreviation (e.g. arch): " TEAM_ID
-    if [ -z "$TEAM_ID" ]; then
-        echo "❌ Team ID is required. Exiting."
-        exit 1
-    fi
+    if [ -z "$TEAM_ID" ]; then echo "❌ Team ID is required. Exiting."; exit 1; fi
+    CONFIG_CHANGED=true
+fi
 
+# Department ID
+if [ -z "${DEPARTMENT_ID:-}" ]; then
     read -r -p "Enter your department abbreviation (e.g. cons): " DEPARTMENT_ID
-    if [ -z "$DEPARTMENT_ID" ]; then
-        echo "❌ Department ID is required. Exiting."
-        exit 1
-    fi
+    if [ -z "$DEPARTMENT_ID" ]; then echo "❌ Department ID is required. Exiting."; exit 1; fi
+    CONFIG_CHANGED=true
+fi
 
+# Save / update config.local (no token stored here — it lives in ~/.zshrc)
+if [ "$CONFIG_CHANGED" = true ]; then
     cat > "$CONFIG_FILE" <<EOF
 # Local configuration - not committed to git
 GITLAB_URL="$GITLAB_URL"
-GITLAB_TOKEN="$GITLAB_TOKEN"
 TEAM_ID="$TEAM_ID"
 DEPARTMENT_ID="$DEPARTMENT_ID"
 EOF
@@ -82,9 +107,6 @@ EOF
     echo "✅ Config saved to config.local"
     echo ""
 fi
-
-# shellcheck source=config.local
-source "$CONFIG_FILE"
 
 # Run installation scripts in order
 run_install_script() {
