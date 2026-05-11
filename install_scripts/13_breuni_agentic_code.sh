@@ -48,8 +48,23 @@ else
     INSTALL_URL="${GITLAB_URL}/beam/go-breuni-agentic-code/-/raw/main/scripts/install.sh"
 
     TMP_SCRIPT=$(mktemp)
-    curl -fsSL --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$INSTALL_URL" -o "$TMP_SCRIPT" \
-        || { echo "❌ Failed to download installer. Check your token and VPN connection."; rm -f "$TMP_SCRIPT"; exit 1; }
+    HTTP_STATUS=$(curl -sSL --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        -o "$TMP_SCRIPT" -w "%{http_code}" "$INSTALL_URL")
+
+    if [ "$HTTP_STATUS" != "200" ]; then
+        echo "❌ Failed to download installer (HTTP $HTTP_STATUS)."
+        echo "   URL: $INSTALL_URL"
+        echo "   Check your GitLab token and VPN connection."
+        rm -f "$TMP_SCRIPT"
+        exit 1
+    fi
+
+    if ! head -1 "$TMP_SCRIPT" | grep -q "^#!"; then
+        echo "❌ Downloaded file is not a shell script (got HTTP $HTTP_STATUS but content looks wrong)."
+        echo "   First line: $(head -1 "$TMP_SCRIPT")"
+        rm -f "$TMP_SCRIPT"
+        exit 1
+    fi
 
     bash "$TMP_SCRIPT"
     rm -f "$TMP_SCRIPT"
