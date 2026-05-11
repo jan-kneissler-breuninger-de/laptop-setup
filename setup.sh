@@ -89,8 +89,17 @@ for rc_file in "$HOME/.zshrc" "$HOME/.bashrc"; do
     fi
 done
 
+# Ensure Homebrew is in PATH if already installed (e.g. re-run scenario)
+if [ -f /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 # Installation order
 run_install_script "01_homebrew.sh"
+
+# Ensure Homebrew is in PATH for all subsequent scripts (covers fresh install)
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 run_install_script "02_git.sh"
 run_install_script "03_development_tools.sh"
 run_install_script "04_claude.sh"
