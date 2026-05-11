@@ -140,6 +140,12 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 run_install_script "02_git.sh"
 run_install_script "03_development_tools.sh"
+
+# Ensure gcloud is in PATH for subsequent scripts
+GCLOUD_PATH_SCRIPT="$(brew --prefix)/share/google-cloud-sdk/path.bash.inc"
+if [ -f "$GCLOUD_PATH_SCRIPT" ]; then
+    source "$GCLOUD_PATH_SCRIPT"
+fi
 run_install_script "04_claude.sh"
 run_install_script "05_docker.sh"
 run_install_script "06_helm.sh"
