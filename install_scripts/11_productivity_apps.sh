@@ -6,6 +6,15 @@ set -e
 
 echo "Installing productivity applications..."
 
+# Install Google Chrome
+if [ -d "/Applications/Google Chrome.app" ]; then
+    echo "✅ Google Chrome is already installed"
+else
+    echo "📦 Installing Google Chrome..."
+    brew install --cask google-chrome
+    echo "✅ Google Chrome installed successfully"
+fi
+
 # Install AnyDesk
 if [ -d "/Applications/AnyDesk.app" ]; then
     echo "✅ AnyDesk is already installed"
