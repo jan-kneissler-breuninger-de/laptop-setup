@@ -36,25 +36,17 @@ if ! command -v glab &> /dev/null; then
     brew install glab
 fi
 
-# Token file location
-GITLAB_TOKEN_FILE="$HOME/.gitlab/glab-token"
+if [ -z "$GITLAB_TOKEN" ]; then
+    echo "❌ GITLAB_TOKEN is not set in config.local. Please re-run setup.sh."
+    exit 1
+fi
 
 # Check if glab is authenticated for the custom host
 echo "Checking glab authentication for $GITLAB_HOST..."
 if ! glab auth status --hostname "$GITLAB_HOST" &>/dev/null; then
-    echo "⚠️  glab is not authenticated for $GITLAB_HOST"
-
-    # Check if token file exists
-    if [ -f "$GITLAB_TOKEN_FILE" ]; then
-        echo "📝 Found token file at $GITLAB_TOKEN_FILE, authenticating..."
-        GITLAB_TOKEN=$(cat "$GITLAB_TOKEN_FILE")
-        echo "$GITLAB_TOKEN" | glab auth login --hostname "$GITLAB_HOST" --stdin
-        echo "✅ Authenticated using token from $GITLAB_TOKEN_FILE"
-    else
-        echo "❌ Token file not found at $GITLAB_TOKEN_FILE"
-        echo "Please create the token file or authenticate with: glab auth login --hostname $GITLAB_HOST"
-        exit 1
-    fi
+    echo "Authenticating glab with $GITLAB_HOST..."
+    echo "$GITLAB_TOKEN" | glab auth login --hostname "$GITLAB_HOST" --stdin
+    echo "✅ glab authenticated"
 else
     echo "✅ glab is already authenticated for $GITLAB_HOST"
 fi

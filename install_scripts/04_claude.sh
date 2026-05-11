@@ -1,27 +1,31 @@
 #!/bin/bash
 
-# Install Claude CLI and run onboarding script
+# Install Claude Code CLI and Gemini CLI
 
 set -e
 
-echo "Installing Claude CLI..."
-
-# Check if Claude CLI is already installed
+# Install Claude Code
+echo "Installing Claude Code..."
 if command -v claude &> /dev/null; then
-    echo "✅ Claude CLI is already installed"
+    echo "✅ Claude Code is already installed"
     claude --version || echo "(version check not available)"
 else
-    echo "📦 Installing Claude CLI via npm..."
+    echo "📦 Installing Claude Code via npm..."
     npm install -g @anthropic-ai/claude-code
-    echo "✅ Claude CLI installed successfully"
+    echo "✅ Claude Code installed successfully"
 fi
 
-# Check if Claude settings already exist
-if [ -f "$HOME/.claude/settings.json" ]; then
-    echo "✅ Claude is already configured (settings.json found)"
+# Install Gemini CLI
+echo ""
+echo "Installing Gemini CLI..."
+if command -v gemini &> /dev/null; then
+    echo "✅ Gemini CLI is already installed"
+    gemini --version || echo "(version check not available)"
 else
-    echo ""
-    echo "⚠️  Claude is not yet configured."
-    echo "   Please add a Claude onboarding script and reference it here."
-    echo "   Onboarding should create: $HOME/.claude/settings.json"
+    echo "📦 Installing Gemini CLI via npm..."
+    npm install -g @google/gemini-cli
+    echo "✅ Gemini CLI installed successfully"
 fi
+
+echo ""
+echo "ℹ️  Claude Code and Gemini CLI will be fully configured by the breuni-agentic-code setup step."

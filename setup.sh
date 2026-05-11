@@ -28,19 +28,57 @@ if [ ! -f "$CONFIG_FILE" ]; then
     echo "========================================="
     echo "First-time setup: configuring local settings"
     echo "========================================="
+    echo ""
 
+    # GitLab URL
     read -r -p "Enter your company GitLab URL (e.g. https://gitlab.example.com): " GITLAB_URL
     GITLAB_URL="${GITLAB_URL%/}"  # strip trailing slash
-
     if [ -z "$GITLAB_URL" ]; then
         echo "❌ GitLab URL is required. Exiting."
+        exit 1
+    fi
+
+    # GitLab Personal Access Token
+    echo ""
+    echo "A GitLab Personal Access Token is required to clone repositories and install"
+    echo "internal tools. To create one:"
+    echo "  1. Open: $GITLAB_URL/-/user_settings/personal_access_tokens"
+    echo "  2. Click 'Add new token'"
+    echo "  3. Name: laptop-setup (or any name)"
+    echo "  4. Expiration: set according to your policy (e.g. 1 year)"
+    echo "  5. Scopes: select 'api'"
+    echo "  6. Click 'Create personal access token'"
+    echo "  7. Copy the token — it won't be shown again!"
+    echo ""
+    read -rs -p "Enter your GitLab Personal Access Token: " GITLAB_TOKEN
+    echo ""
+    if [ -z "$GITLAB_TOKEN" ]; then
+        echo "❌ GitLab token is required. Exiting."
+        exit 1
+    fi
+
+    # Team and Department IDs (used for telemetry attribution)
+    echo ""
+    read -r -p "Enter your team abbreviation (e.g. arch): " TEAM_ID
+    if [ -z "$TEAM_ID" ]; then
+        echo "❌ Team ID is required. Exiting."
+        exit 1
+    fi
+
+    read -r -p "Enter your department abbreviation (e.g. cons): " DEPARTMENT_ID
+    if [ -z "$DEPARTMENT_ID" ]; then
+        echo "❌ Department ID is required. Exiting."
         exit 1
     fi
 
     cat > "$CONFIG_FILE" <<EOF
 # Local configuration - not committed to git
 GITLAB_URL="$GITLAB_URL"
+GITLAB_TOKEN="$GITLAB_TOKEN"
+TEAM_ID="$TEAM_ID"
+DEPARTMENT_ID="$DEPARTMENT_ID"
 EOF
+    echo ""
     echo "✅ Config saved to config.local"
     echo ""
 fi
@@ -111,6 +149,7 @@ run_install_script "09_clone_gitlab_repos.sh"
 run_install_script "10_clone_github_repos.sh"
 run_install_script "11_productivity_apps.sh"
 run_install_script "12_python.sh"
+run_install_script "13_breuni_agentic_code.sh"
 
 log "========================================="
 log "Setup complete!"

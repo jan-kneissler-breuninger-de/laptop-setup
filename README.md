@@ -16,7 +16,13 @@ This will:
 3. Clone this repository to `~/laptop-setup`
 4. Run the full setup
 
-On first run you will be asked for your company GitLab URL. This is saved locally in `config.local` (not committed) and reused on subsequent runs.
+On first run you will be asked for:
+
+- **GitLab URL** — your company GitLab instance (e.g. `https://gitlab.example.com`)
+- **GitLab Personal Access Token** — required to clone repos and install internal tools. Create one at `<your-gitlab>/-/user_settings/personal_access_tokens` with scope `api`
+- **Team ID** and **Department ID** — used for telemetry attribution in Cloud Monitoring
+
+These are saved locally in `config.local` (gitignored) and reused on subsequent runs.
 
 ## What Gets Installed
 
@@ -24,8 +30,10 @@ On first run you will be asked for your company GitLab URL. This is saved locall
 - Git
 - Node.js and npm
 - Google Cloud CLI (gcloud) with components
-- Claude CLI
+- Claude Code CLI
+- Gemini CLI
 - Podman Desktop
+- breuni-agentic-code (telemetry daemon — configures Claude Code and Gemini CLI with Vertex AI + OTEL)
 - JetBrains IDEs (IntelliJ IDEA, GoLand, PyCharm)
 - Additional tools (terraform, kubectl, glab, gh, jq, graphviz, tfswitch, helm)
 - Productivity apps (AnyDesk, AltTab, BitWarden, DaisyDisk, draw.io, Postman)
@@ -50,9 +58,12 @@ https://your-gitlab.example.com/another-group
 
 Add any extra packages to install via Homebrew, one per line.
 
-### Claude onboarding (`install_scripts/04_claude.sh`)
+### breuni-agentic-code (`install_scripts/13_breuni_agentic_code.sh`)
 
-After installing Claude CLI, the script will warn if no onboarding/configuration is set up. Add your company-specific Claude onboarding script there.
+The final setup step installs the `breuni-agentic-code` daemon from your company GitLab. It:
+- Downloads and installs the binary using your GitLab token
+- Runs `breuni-agentic-code setup` which configures Claude Code and Gemini CLI with Vertex AI and OTEL telemetry
+- Installs the daemon as a system service so it auto-starts on login
 
 ## Re-running
 
