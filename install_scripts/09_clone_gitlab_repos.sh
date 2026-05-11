@@ -32,8 +32,8 @@ mkdir -p "$CLONE_BASE_DIR"
 
 # Check if glab is installed
 if ! command -v glab &> /dev/null; then
-    echo "❌ glab is not installed. Please install it first."
-    exit 1
+    echo "📦 Installing glab..."
+    brew install glab
 fi
 
 # Token file location

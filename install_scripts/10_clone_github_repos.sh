@@ -16,8 +16,8 @@ mkdir -p "$CLONE_BASE_DIR"
 
 # Check if gh (GitHub CLI) is installed
 if ! command -v gh &> /dev/null; then
-    echo "❌ gh (GitHub CLI) is not installed. Please install it first."
-    exit 1
+    echo "📦 Installing gh (GitHub CLI)..."
+    brew install gh
 fi
 
 # Token file location
