@@ -1,6 +1,8 @@
 # GitLab groups to clone all repositories from
 # One group URL per line, comments starting with # are ignored
 
-https://gitlab.breuni.de/ace
-https://gitlab.breuni.de/gcp
-https://gitlab.breuni.de/jan-kneissler
+# Add your GitLab group URLs here, one per line
+# The GitLab host is derived automatically from these URLs
+# Example:
+# https://your-gitlab.example.com/your-group
+# https://your-gitlab.example.com/another-group

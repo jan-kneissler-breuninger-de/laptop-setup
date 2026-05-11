@@ -22,5 +22,5 @@ if [ -f ~/.ssh/id_rsa.pub ] || [ -f ~/.ssh/id_ed25519.pub ]; then
 else
     echo "⚠️  No SSH key found"
     echo "To generate an SSH key, run: ssh-keygen"
-    echo "Then add it to GitLab: https://gitlab.breuni.de/-/user_settings/ssh_keys"
+    echo "Then add the public key to your GitLab instance under: Settings > SSH Keys"
 fi

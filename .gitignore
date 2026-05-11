@@ -1,3 +1,6 @@
+# Local configuration (contains machine-specific settings like GitLab URL)
+config.local
+
 # Logs directory - don't commit installation logs
 logs/
 

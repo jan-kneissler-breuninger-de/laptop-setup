@@ -10,7 +10,22 @@ echo "Cloning GitLab repositories..."
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 GITLAB_FILE="$SCRIPT_DIR/../gitlab.txt"
 CLONE_BASE_DIR="$HOME/git/gitlab"
-GITLAB_HOST="gitlab.breuni.de"
+# Load GitLab URL from local config
+CONFIG_FILE="$SCRIPT_DIR/../config.local"
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "❌ config.local not found. Please run setup.sh first to configure your GitLab URL."
+    exit 1
+fi
+# shellcheck source=config.local
+source "$CONFIG_FILE"
+
+if [ -z "$GITLAB_URL" ]; then
+    echo "❌ GITLAB_URL is not set in config.local."
+    exit 1
+fi
+
+GITLAB_HOST=$(echo "$GITLAB_URL" | sed 's|https://||' | cut -d'/' -f1)
+echo "GitLab host: $GITLAB_HOST"
 
 # Create base directory for cloned repos
 mkdir -p "$CLONE_BASE_DIR"
@@ -50,7 +65,7 @@ if [ -f "$GITLAB_FILE" ]; then
         [[ -z "$group_url" || "$group_url" =~ ^[[:space:]]*# ]] && continue
 
         # Extract group path from URL (e.g., https://gitlab.breuni.de/ace -> ace)
-        group_path=$(echo "$group_url" | sed 's|https://gitlab.breuni.de/||' | sed 's|/$||')
+        group_path=$(echo "$group_url" | sed "s|https://$GITLAB_HOST/||" | sed 's|/$||')
 
         echo "📂 Processing group: $group_path"
 

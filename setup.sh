@@ -21,6 +21,33 @@ log "========================================="
 log "Starting MacBook setup"
 log "========================================="
 
+# Load or create local config
+CONFIG_FILE="$SCRIPT_DIR/config.local"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "========================================="
+    echo "First-time setup: configuring local settings"
+    echo "========================================="
+
+    read -r -p "Enter your company GitLab URL (e.g. https://gitlab.example.com): " GITLAB_URL
+    GITLAB_URL="${GITLAB_URL%/}"  # strip trailing slash
+
+    if [ -z "$GITLAB_URL" ]; then
+        echo "❌ GitLab URL is required. Exiting."
+        exit 1
+    fi
+
+    cat > "$CONFIG_FILE" <<EOF
+# Local configuration - not committed to git
+GITLAB_URL="$GITLAB_URL"
+EOF
+    echo "✅ Config saved to config.local"
+    echo ""
+fi
+
+# shellcheck source=config.local
+source "$CONFIG_FILE"
+
 # Run installation scripts in order
 run_install_script() {
     local script=$1
