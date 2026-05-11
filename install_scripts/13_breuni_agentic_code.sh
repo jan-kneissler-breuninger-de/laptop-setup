@@ -18,13 +18,21 @@ if [ ! -f "$CONFIG_FILE" ]; then
 fi
 source "$CONFIG_FILE"
 
-if [ -z "$GITLAB_URL" ] || [ -z "$GITLAB_TOKEN" ]; then
-    echo "❌ GITLAB_URL and GITLAB_TOKEN are required in config.local."
-    exit 1
+# Token lives in ~/.gitlab/glab-token (written by setup.sh); fall back to env var
+if [ -z "${GITLAB_TOKEN:-}" ]; then
+    GLAB_TOKEN_FILE="$HOME/.gitlab/glab-token"
+    if [ -f "$GLAB_TOKEN_FILE" ]; then
+        GITLAB_TOKEN=$(cat "$GLAB_TOKEN_FILE")
+    else
+        echo "❌ GitLab token not found. Please re-run setup.sh."
+        exit 1
+    fi
 fi
+export GITLAB_TOKEN
+export BRAC_GITLAB_TOKEN="$GITLAB_TOKEN"
 
-if [ -z "$TEAM_ID" ] || [ -z "$DEPARTMENT_ID" ]; then
-    echo "❌ TEAM_ID and DEPARTMENT_ID are required in config.local."
+if [ -z "${GITLAB_URL:-}" ] || [ -z "${TEAM_ID:-}" ] || [ -z "${DEPARTMENT_ID:-}" ]; then
+    echo "❌ GITLAB_URL, TEAM_ID and DEPARTMENT_ID are required in config.local."
     exit 1
 fi
 
@@ -43,7 +51,6 @@ else
     curl -fsSL --header "PRIVATE-TOKEN: $GITLAB_TOKEN" "$INSTALL_URL" -o "$TMP_SCRIPT" \
         || { echo "❌ Failed to download installer. Check your token and VPN connection."; rm -f "$TMP_SCRIPT"; exit 1; }
 
-    export BRAC_GITLAB_TOKEN="$GITLAB_TOKEN"
     bash "$TMP_SCRIPT"
     rm -f "$TMP_SCRIPT"
 
