@@ -145,21 +145,24 @@ log "========================================="
 # Make kubernetes-utils scripts executable
 chmod +x "$SCRIPT_DIR/kubernetes-utils"/*
 
-# Add kubernetes-utils to PATH in shell configuration files
-KUBE_UTILS_PATH="export PATH=\"\$PATH:$SCRIPT_DIR/kubernetes-utils\""
-
+# Add ~/.local/bin and kubernetes-utils to PATH in shell configuration files
 for rc_file in "$HOME/.zshrc" "$HOME/.bashrc"; do
     if [ -f "$rc_file" ]; then
-        if ! grep -q "kubernetes-utils" "$rc_file"; then
+        if ! grep -q "\.local/bin" "$rc_file"; then
             echo "" >> "$rc_file"
-            echo "# Add kubernetes-utils to PATH" >> "$rc_file"
-            echo "$KUBE_UTILS_PATH" >> "$rc_file"
+            echo "# Added by laptop-setup" >> "$rc_file"
+            echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> "$rc_file"
+            log "✅ Added ~/.local/bin to PATH in $rc_file"
+        fi
+        if ! grep -q "kubernetes-utils" "$rc_file"; then
+            echo "export PATH=\"\$PATH:$SCRIPT_DIR/kubernetes-utils\"" >> "$rc_file"
             log "✅ Added kubernetes-utils to PATH in $rc_file"
-        else
-            log "ℹ️  PATH already configured in $rc_file"
         fi
     fi
 done
+
+# Make ~/.local/bin available in the current session too
+export PATH="$HOME/.local/bin:$PATH"
 
 # Ensure Homebrew is in PATH if already installed (e.g. re-run scenario)
 if [ -f /opt/homebrew/bin/brew ]; then
