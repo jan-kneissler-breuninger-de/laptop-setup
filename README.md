@@ -25,7 +25,7 @@ On first run you will be asked for your company GitLab URL. This is saved locall
 - Node.js and npm
 - Google Cloud CLI (gcloud) with components
 - Claude CLI
-- Docker Desktop
+- Podman Desktop
 - JetBrains IDEs (IntelliJ IDEA, GoLand, PyCharm)
 - Additional tools (terraform, kubectl, glab, gh, jq, graphviz, tfswitch, helm)
 - Productivity apps (AnyDesk, AltTab, BitWarden, DaisyDisk, draw.io, Postman)
