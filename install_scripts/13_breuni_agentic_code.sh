@@ -50,16 +50,6 @@ else
     echo "✅ breuni-agentic-code installed"
 fi
 
-# Ensure gcloud Application Default Credentials are configured
-echo ""
-echo "Checking gcloud Application Default Credentials (ADC)..."
-if gcloud auth application-default print-access-token &>/dev/null; then
-    echo "✅ gcloud ADC already configured"
-else
-    echo "⚠️  gcloud ADC not configured. A browser window will open for authentication."
-    gcloud auth application-default login
-fi
-
 # Run breuni-agentic-code setup
 # This configures Claude Code and Gemini CLI with Vertex AI + telemetry settings
 # and installs the daemon as a system service (auto-starts on login)

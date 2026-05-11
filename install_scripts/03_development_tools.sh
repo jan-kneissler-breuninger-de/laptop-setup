@@ -31,8 +31,8 @@ echo "Checking gcloud authentication..."
 if gcloud auth print-identity-token &>/dev/null; then
     echo "✅ gcloud is authenticated"
 else
-    echo "⚠️  gcloud is not authenticated"
-    echo "To authenticate, run: gcloud auth login --update-adc"
+    echo "⚠️  gcloud is not authenticated. A browser window will open to log in."
+    gcloud auth login --update-adc
 fi
 
 # Install gcloud components if authenticated
