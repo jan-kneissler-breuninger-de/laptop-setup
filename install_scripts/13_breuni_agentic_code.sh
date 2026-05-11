@@ -45,7 +45,7 @@ if command -v breuni-agentic-code &>/dev/null; then
     breuni-agentic-code --version 2>/dev/null || true
 else
     echo "📦 Downloading breuni-agentic-code installer..."
-    INSTALL_URL="${GITLAB_URL}/beam/go-breuni-agentic-code/-/raw/main/scripts/install.sh"
+    INSTALL_URL="${GITLAB_URL}/api/v4/projects/beam%2Fgo-breuni-agentic-code/repository/files/scripts%2Finstall.sh/raw?ref=main"
 
     TMP_SCRIPT=$(mktemp)
     HTTP_STATUS=$(curl -sSL --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
