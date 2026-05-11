@@ -1,104 +1,97 @@
-## Setup New MacBook Instructions
+# MacBook Setup
 
-This repository contains automated scripts to set up a new MacBook with all necessary development tools.
+Automated scripts to set up a new MacBook with all necessary development tools.
 
-## Quick Start (Automated Setup)
+## Install
 
-After cloning this repository, run:
+Run this single command on your new Mac (only Homebrew required — everything else is handled automatically):
 
 ```bash
-./setup.sh
+curl -fsSL https://raw.githubusercontent.com/jan-kneissler-breuninger-de/laptop-setup/main/install.sh | bash
 ```
 
-This will install and configure:
+This will:
+1. Install Homebrew (if not already installed)
+2. Install git (if not already installed)
+3. Clone this repository to `~/laptop-setup`
+4. Run the full setup
+
+On first run you will be asked for your company GitLab URL. This is saved locally in `config.local` (not committed) and reused on subsequent runs.
+
+## What Gets Installed
+
 - Homebrew package manager
-- Git version control
+- Git
 - Node.js and npm
 - Google Cloud CLI (gcloud) with components
-- Claude CLI with telemetry configuration
+- Claude CLI
 - Docker Desktop
 - JetBrains IDEs (IntelliJ IDEA, GoLand, PyCharm)
-- Additional tools (terraform, kubectl, glab, gh, jq, graphviz, tfswitch)
+- Additional tools (terraform, kubectl, glab, gh, jq, graphviz, tfswitch, helm)
 - Productivity apps (AnyDesk, AltTab, BitWarden, DaisyDisk, draw.io, Postman)
-- Clone GitLab repositories from configured groups
-- Clone GitHub repositories from configured users/orgs
-- Python (via Homebrew) with pip
+- GitLab repositories from configured groups
+- GitHub repositories from configured users/orgs
+- Python (via Homebrew)
 
 All installation steps are logged in the `logs/` directory.
 
-## Manual Steps
+## Configuration
 
-### 1. Chrome Browser
+### GitLab groups to clone (`gitlab.txt`)
 
-Download from https://www.google.com/intl/de/chrome/
+Add the GitLab groups whose repositories you want cloned:
 
-### 2. Initial Git Setup (before cloning this repo)
-
-```bash
-# Install Homebrew first
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo >> ~/.zprofile
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# Install Git
-brew install git
-
-# Generate SSH key
-ssh-keygen
+```
+https://your-gitlab.example.com/your-group
+https://your-gitlab.example.com/another-group
 ```
 
-Go to https://gitlab.breuni.de/-/user_settings/ssh_keys and register your SSH key.
+### Additional Homebrew packages (`brew-install.txt`)
 
-### 3. Clone This Repository
+Add any extra packages to install via Homebrew, one per line.
+
+### Claude onboarding (`install_scripts/04_claude.sh`)
+
+After installing Claude CLI, the script will warn if no onboarding/configuration is set up. Add your company-specific Claude onboarding script there.
+
+## Re-running
+
+The scripts are idempotent — safe to run multiple times. Already-installed tools are skipped.
+
+To update an existing installation:
 
 ```bash
-git clone git@gitlab.breuni.de:jan-kneissler/laptop-setup.git
-cd laptop-setup
+cd ~/laptop-setup && git pull && ./setup.sh
 ```
-
-### 4. Run Automated Setup
-
-```bash
-./setup.sh
-```
-
-## Adding New Software
-
-To add new software installations:
-
-1. Copy the template: `cp install_scripts/00_template.sh install_scripts/05_yourname.sh`
-2. Edit the new script to install your software
-3. Add the script to `setup.sh` in the appropriate order
-4. Commit the changes
 
 ## Directory Structure
 
 ```
 laptop-setup/
+├── install.sh                  # Bootstrap script (curl | bash entry point)
 ├── setup.sh                    # Main orchestration script
-├── claude_onboarding.sh        # Claude-specific configuration
+├── gitlab.txt                  # GitLab groups to clone
+├── brew-install.txt            # Additional Homebrew packages
+├── config.local                # Local config (git-ignored, created on first run)
 ├── install_scripts/            # Modular installation scripts
-│   ├── 00_template.sh         # Template for new scripts
-│   ├── 01_homebrew.sh         # Homebrew installation
-│   ├── 02_git.sh              # Git installation
-│   ├── 03_development_tools.sh # npm, gcloud, etc.
-│   ├── 04_claude.sh           # Claude CLI installation
-│   └── 05_docker.sh           # Docker Desktop installation
-├── logs/                       # Installation logs (git-ignored)
-└── README.md                   # This file
+│   ├── 00_template.sh
+│   ├── 01_homebrew.sh
+│   ├── 02_git.sh
+│   ├── 03_development_tools.sh
+│   ├── 04_claude.sh
+│   ├── 05_docker.sh
+│   ├── 06_helm.sh
+│   ├── 07_jetbrains_ides.sh
+│   ├── 08_brew_packages.sh
+│   ├── 09_clone_gitlab_repos.sh
+│   ├── 10_clone_github_repos.sh
+│   ├── 11_productivity_apps.sh
+│   └── 12_python.sh
+└── logs/                       # Installation logs (git-ignored)
 ```
 
-## Features
+## Adding New Software
 
-- **Idempotent**: Scripts can be run multiple times safely
-- **Modular**: Each software has its own installation script
-- **Logged**: All installations are logged with timestamps
-- **Version Controlled**: Track what software is installed over time
-
-## Notes
-
-**Docker Installation**: The Docker installation script requires sudo access to create necessary directories. When running `./setup.sh`, you'll be prompted for your password during the Docker installation step. After installation, remember to:
-1. Open Docker Desktop from Applications
-2. Accept the license agreement
-3. Wait for Docker to fully start (whale icon appears in menu bar)
+1. Copy the template: `cp install_scripts/00_template.sh install_scripts/13_yourname.sh`
+2. Edit the new script
+3. Add it to `setup.sh` in the appropriate order
