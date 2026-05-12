@@ -15,14 +15,25 @@ if [ -f "$BREW_PACKAGES_FILE" ]; then
         # Skip empty lines and comments
         [[ -z "$package" || "$package" =~ ^[[:space:]]*# ]] && continue
 
+        # Extract tap if package is in format "tap/package"
+        if [[ "$package" == *"/"*"/"* ]]; then
+            tap="${package%/*}"
+            if ! brew tap | grep -q "^${tap}$" 2>/dev/null; then
+                echo "📦 Adding tap: $tap"
+                brew tap "$tap" || true
+            fi
+        fi
+
         # Check if package is already installed
         if brew list "$package" &>/dev/null; then
-            echo "✅ $package is already installed, updating..."
-            brew upgrade "$package" 2>/dev/null || echo "✅ $package is up to date"
+            echo "✅ $package is already installed"
         else
             echo "📦 Installing $package..."
-            brew install "$package"
-            echo "✅ $package installed successfully"
+            if brew install "$package"; then
+                echo "✅ $package installed successfully"
+            else
+                echo "⚠️  Failed to install $package, continuing..."
+            fi
         fi
     done < "$BREW_PACKAGES_FILE"
 else

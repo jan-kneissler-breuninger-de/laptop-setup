@@ -72,15 +72,21 @@ else
     echo "✅ breuni-agentic-code installed"
 fi
 
-# Run breuni-agentic-code setup
-# This configures Claude Code and Gemini CLI with Vertex AI + telemetry settings
-# and installs the daemon as a system service (auto-starts on login)
-echo ""
-echo "Running breuni-agentic-code setup..."
-echo "This will configure Claude Code and Gemini CLI and install the telemetry daemon."
-echo ""
-breuni-agentic-code setup --service --team-id "$TEAM_ID" --department-id "$DEPARTMENT_ID"
+# Check if breuni-agentic-code is already configured
+if breuni-agentic-code status &>/dev/null; then
+    echo "✅ breuni-agentic-code is already configured and running"
+    breuni-agentic-code status
+else
+    # Run breuni-agentic-code setup
+    # This configures Claude Code and Gemini CLI with Vertex AI + telemetry settings
+    # and installs the daemon as a system service (auto-starts on login)
+    echo ""
+    echo "Running breuni-agentic-code setup..."
+    echo "This will configure Claude Code and Gemini CLI and install the telemetry daemon."
+    echo ""
+    breuni-agentic-code setup --service --team-id "$TEAM_ID" --department-id "$DEPARTMENT_ID"
 
-echo ""
-echo "✅ breuni-agentic-code setup complete"
-echo "   Run 'breuni-agentic-code status' to verify everything is running."
+    echo ""
+    echo "✅ breuni-agentic-code setup complete"
+    echo "   Run 'breuni-agentic-code status' to verify everything is running."
+fi

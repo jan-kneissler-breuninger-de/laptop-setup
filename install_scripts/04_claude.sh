@@ -26,6 +26,3 @@ else
     npm install -g @google/gemini-cli
     echo "✅ Gemini CLI installed successfully"
 fi
-
-echo ""
-echo "ℹ️  Claude Code and Gemini CLI will be fully configured by the breuni-agentic-code setup step."

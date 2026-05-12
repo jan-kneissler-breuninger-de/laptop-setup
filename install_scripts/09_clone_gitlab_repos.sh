@@ -51,10 +51,68 @@ else
     echo "✅ glab is already authenticated for $GITLAB_HOST"
 fi
 
+# Create gitlab.txt if it doesn't exist (from example or blank)
+if [ ! -f "$GITLAB_FILE" ]; then
+    GITLAB_EXAMPLE="$SCRIPT_DIR/../gitlab.txt.example"
+    if [ -f "$GITLAB_EXAMPLE" ]; then
+        cp "$GITLAB_EXAMPLE" "$GITLAB_FILE"
+        echo "Created $GITLAB_FILE from gitlab.txt.example"
+    else
+        echo "# GitLab groups to clone all repositories from" > "$GITLAB_FILE"
+        echo "# One group URL per line, comments starting with # are ignored" >> "$GITLAB_FILE"
+        echo "" >> "$GITLAB_FILE"
+        echo "Created $GITLAB_FILE"
+    fi
+fi
+
+# Check if gitlab.txt has any non-comment, non-empty lines
+groups_count=$(grep -v '^[[:space:]]*#' "$GITLAB_FILE" | grep -v '^[[:space:]]*$' | wc -l | tr -d ' ')
+
+if [ "$groups_count" -eq 0 ]; then
+    echo ""
+    echo "⚠️  No GitLab groups configured in gitlab.txt"
+    echo ""
+    echo "Please enter GitLab group names to clone (one per line, empty line to finish):"
+    echo "Example: ace (will be converted to $GITLAB_URL/ace)"
+    echo ""
+
+    while true; do
+        read -p "GitLab group name (or press Enter to finish): " group_input
+
+        # If empty, break
+        if [ -z "$group_input" ]; then
+            break
+        fi
+
+        # If input doesn't start with http, prepend the GitLab URL
+        if [[ "$group_input" != http* ]]; then
+            group_url="$GITLAB_URL/$group_input"
+        else
+            group_url="$group_input"
+        fi
+
+        # Add to file
+        echo "$group_url" >> "$GITLAB_FILE"
+        echo "✅ Added: $group_url"
+    done
+
+    # Re-count after adding
+    groups_count=$(grep -v '^[[:space:]]*#' "$GITLAB_FILE" | grep -v '^[[:space:]]*$' | wc -l | tr -d ' ')
+
+    if [ "$groups_count" -eq 0 ]; then
+        echo "No groups added. Skipping GitLab repository cloning."
+        exit 0
+    fi
+    echo ""
+fi
+
 if [ -f "$GITLAB_FILE" ]; then
+    groups_found=0
     while IFS= read -r group_url || [ -n "$group_url" ]; do
         # Skip empty lines and comments
         [[ -z "$group_url" || "$group_url" =~ ^[[:space:]]*# ]] && continue
+
+        groups_found=$((groups_found + 1))
 
         # Extract group path from URL (e.g., https://gitlab.breuni.de/ace -> ace)
         group_path=$(echo "$group_url" | sed "s|https://$GITLAB_HOST/||" | sed 's|/$||')
@@ -91,10 +149,11 @@ if [ -f "$GITLAB_FILE" ]; then
 
         echo "✅ Completed processing group: $group_path"
     done < "$GITLAB_FILE"
-else
-    echo "⚠️  gitlab.txt file not found at $GITLAB_FILE"
-    exit 1
-fi
 
-echo "✅ All GitLab repositories processed successfully"
-echo "Repositories cloned to: $CLONE_BASE_DIR"
+    if [ "$groups_found" -eq 0 ]; then
+        echo "⚠️  No GitLab groups were processed"
+    else
+        echo "✅ All GitLab repositories processed successfully"
+        echo "Repositories cloned to: $CLONE_BASE_DIR"
+    fi
+fi

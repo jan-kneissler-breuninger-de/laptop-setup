@@ -32,21 +32,60 @@ if ! gh auth status &>/dev/null; then
     if [ -f "$GITHUB_TOKEN_FILE" ]; then
         echo "📝 Found token file at $GITHUB_TOKEN_FILE, authenticating..."
         GITHUB_TOKEN=$(cat "$GITHUB_TOKEN_FILE")
-        echo "$GITHUB_TOKEN" | gh auth login --with-token
-        echo "✅ Authenticated using token from $GITHUB_TOKEN_FILE"
+        if echo "$GITHUB_TOKEN" | gh auth login --with-token 2>&1; then
+            echo "✅ Authenticated using token from $GITHUB_TOKEN_FILE"
+        else
+            echo "❌ Token from $GITHUB_TOKEN_FILE is invalid"
+            echo "   Removing invalid token file..."
+            rm -f "$GITHUB_TOKEN_FILE"
+            exit 1
+        fi
     else
-        echo "❌ Token file not found at $GITHUB_TOKEN_FILE"
-        echo "Please create the token file or authenticate with: gh auth login"
-        exit 1
+        echo ""
+        echo "GitHub token not found. Please provide a GitHub Personal Access Token."
+        echo "You can create one at: https://github.com/settings/tokens"
+        echo "Required scopes: repo, read:org"
+        echo ""
+        read -sp "GitHub Token: " GITHUB_TOKEN
+        echo ""
+
+        if [ -z "$GITHUB_TOKEN" ]; then
+            echo "❌ No token provided. Exiting."
+            exit 1
+        fi
+
+        # Save token to file
+        mkdir -p "$(dirname "$GITHUB_TOKEN_FILE")"
+        echo "$GITHUB_TOKEN" > "$GITHUB_TOKEN_FILE"
+        chmod 600 "$GITHUB_TOKEN_FILE"
+        echo "💾 Token saved to $GITHUB_TOKEN_FILE"
+
+        # Authenticate with gh
+        if echo "$GITHUB_TOKEN" | gh auth login --with-token 2>&1; then
+            echo "✅ Authenticated with GitHub"
+        else
+            echo "❌ Failed to authenticate. Please check your token is valid."
+            echo "   Create a new token at: https://github.com/settings/tokens"
+            echo "   Required scopes: repo, read:org"
+            rm -f "$GITHUB_TOKEN_FILE"
+            exit 1
+        fi
     fi
 else
     echo "✅ gh is already authenticated"
 fi
 
+# Configure git to use gh as credential helper
+echo "Configuring git to use GitHub CLI for authentication..."
+gh auth setup-git
+
 if [ -f "$GITHUB_FILE" ]; then
+    users_found=0
     while IFS= read -r user_or_org || [ -n "$user_or_org" ]; do
         # Skip empty lines and comments
         [[ -z "$user_or_org" || "$user_or_org" =~ ^[[:space:]]*# ]] && continue
+
+        users_found=$((users_found + 1))
 
         echo "📂 Processing GitHub user/org: $user_or_org"
 
@@ -79,10 +118,15 @@ if [ -f "$GITHUB_FILE" ]; then
 
         echo "✅ Completed processing user/org: $user_or_org"
     done < "$GITHUB_FILE"
+
+    if [ "$users_found" -eq 0 ]; then
+        echo "⚠️  No GitHub users/orgs found in $GITHUB_FILE"
+        echo "   Add GitHub usernames or organizations to github.txt (one per line)"
+    else
+        echo "✅ All GitHub repositories processed successfully"
+        echo "Repositories cloned to: $CLONE_BASE_DIR"
+    fi
 else
     echo "⚠️  github.txt file not found at $GITHUB_FILE"
     exit 1
 fi
-
-echo "✅ All GitHub repositories processed successfully"
-echo "Repositories cloned to: $CLONE_BASE_DIR"

@@ -1,6 +1,9 @@
 # Local configuration (contains machine-specific settings like GitLab URL)
 config.local
 
+# GitLab groups to clone (machine-specific, use gitlab.txt.example as template)
+gitlab.txt
+
 # Logs directory - don't commit installation logs
 logs/
 

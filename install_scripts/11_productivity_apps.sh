@@ -6,6 +6,15 @@ set -e
 
 echo "Installing productivity applications..."
 
+# Install mas (Mac App Store CLI) if not already installed
+if command -v mas &>/dev/null; then
+    echo "✅ mas is already installed"
+else
+    echo "📦 Installing mas (Mac App Store CLI)..."
+    brew install mas
+    echo "✅ mas installed successfully"
+fi
+
 # Install Google Chrome
 if [ -d "/Applications/Google Chrome.app" ]; then
     echo "✅ Google Chrome is already installed"
